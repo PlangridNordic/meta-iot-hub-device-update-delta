@@ -16,8 +16,9 @@ SRC_URI = "${ADU_DELTA_SRC_URI};protocol=https;branch=${ADU_DELTA_GIT_BRANCH}"
 
 # Use the scarthgap branch commit (with fixes for algorithm rename and pkgconfig)
 SRCREV = "${AUTOREV}"
+# AUTOREV needs a "+" in PV (the git revision is appended after it).
+PV .= "+git"
 
-S = "${WORKDIR}/git"
 OECMAKE_SOURCEPATH = "${S}/src/native"
 
 # Base dependencies

@@ -10,8 +10,9 @@ inherit native
 # Source configuration - use same as processor recipe
 SRC_URI = "${ADU_DELTA_SRC_URI};protocol=https;branch=${ADU_DELTA_GIT_BRANCH}"
 SRCREV = "${AUTOREV}"
+# AUTOREV needs a "+" in PV (the git revision is appended after it).
+PV .= "+git"
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 # Runtime dependencies - none for native recipe
@@ -100,17 +101,21 @@ python do_patch:append() {
 do_compile[network] = "1"
 
 # Check for .NET SDK at runtime
+# The .NET SDK is a build host tool. Without it, skip this recipe instead of
+# failing the whole parse: only builds that need the DiffGenTool (delta
+# generation) then fail, with this message.
 python() {
     import subprocess
-    try:
-        result = subprocess.run(['dotnet', '--version'], capture_output=True, text=True, check=False)
-        if result.returncode != 0:
-            bb.fatal("dotnet SDK not found. Please install .NET 6 or 8 SDK:\n" +
+    install_hint = ("Please install the .NET 8 SDK:\n" +
                     "  wget https://dot.net/v1/dotnet-install.sh\n" +
                     "  chmod +x dotnet-install.sh\n" +
                     "  sudo ./dotnet-install.sh --channel 8.0 --install-dir /usr/share/dotnet")
+    try:
+        result = subprocess.run(['dotnet', '--version'], capture_output=True, text=True, check=False)
+        if result.returncode != 0:
+            raise bb.parse.SkipRecipe("dotnet SDK not found. " + install_hint)
     except FileNotFoundError:
-        bb.fatal("dotnet command not found in PATH. Please install .NET SDK.")
+        raise bb.parse.SkipRecipe("dotnet command not found in PATH. " + install_hint)
 }
 
 # No CMake needed - we use dotnet build

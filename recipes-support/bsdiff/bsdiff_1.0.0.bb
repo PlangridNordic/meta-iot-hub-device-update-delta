@@ -16,7 +16,6 @@ SRC_URI = "git://github.com/zhuyie/bsdiff.git;protocol=https;branch=master \
 # Date: Feb 8, 2022 - This is based on iot-hub-device-update-delta/vcpkg/ports/bsdiff/portfile.cmake
 #                     This requires bsdiff-cmakelistspath (see SRC_URI above)
 SRCREV = "6b70bf123c725d181505c7bc181debf8236274e3"
-S = "${WORKDIR}/git" 
 
 #
 # OPTION#2 - Following is an example for building bsdiff using a local tarball.
